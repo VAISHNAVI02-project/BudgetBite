@@ -68,9 +68,9 @@ To make food ordering more convenient by helping users discover food options tha
 
 ## 👩‍💻 Developed By
 
-Vaishnavi
-Pallavi
-Lahari
-Madhusree
-Fasiha khan
+Vaishnavi,
+Pallavi,
+Lahari,
+Madhusree,
+Fasiha khan.
 
