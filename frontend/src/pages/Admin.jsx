@@ -24,7 +24,8 @@ function Admin() {
         throw new Error(data.error || "Unable to load orders.");
       }
 
-      setOrders(data);
+      setOrders(Array.isArray(data) ? data : []);
+      setError("");
     } catch (err) {
       setError(err.message || "Unable to load orders.");
     } finally {
@@ -77,8 +78,8 @@ function Admin() {
         throw new Error(data.error || "Unable to update status.");
       }
 
-      setOrders((previousOrders) =>
-        previousOrders.map((order) =>
+      setOrders((previous) =>
+        previous.map((order) =>
           String(order.orderId) === String(orderId)
             ? { ...order, status: data.status }
             : order
@@ -97,7 +98,6 @@ function Admin() {
       }
 
       await fetchSummary();
-      alert("Order status updated successfully!");
     } catch (err) {
       setError(err.message || "Could not update order status.");
       await fetchOrders();
@@ -108,131 +108,171 @@ function Admin() {
 
   const summaryCards = summary
     ? [
-        {
-          title: "Total Orders",
-          value: summary.totalOrders,
-          color: "#e8f0ff",
-        },
+        { title: "Total Orders", value: summary.totalOrders },
         {
           title: "Total Revenue",
-          value: `₹${Number(summary.totalRevenue).toLocaleString("en-IN")}`,
-          color: "#e5f8eb",
+          value: `₹${Number(summary.totalRevenue || 0).toLocaleString("en-IN")}`,
         },
-        {
-          title: "Order Placed",
-          value: summary.placedOrders,
-          color: "#fff3d6",
-        },
-        {
-          title: "Preparing Food",
-          value: summary.preparingOrders,
-          color: "#f0e8ff",
-        },
-        {
-          title: "Out for Delivery",
-          value: summary.deliveryOrders,
-          color: "#ffe9df",
-        },
-        {
-          title: "Delivered",
-          value: summary.deliveredOrders,
-          color: "#ddf7f4",
-        },
+        { title: "Order Placed", value: summary.placedOrders },
+        { title: "Preparing Food", value: summary.preparingOrders },
+        { title: "Out for Delivery", value: summary.deliveryOrders },
+        { title: "Delivered", value: summary.deliveredOrders },
       ]
     : [];
 
   return (
-    <div className="page-container">
-      <h1>Admin Dashboard ⚙️</h1>
-      <p>Manage customer orders, revenue, and delivery status.</p>
-
-      <button onClick={refreshDashboard} disabled={loading}>
-        Refresh Dashboard
-      </button>
-
-      {error && <p role="alert">{error}</p>}
-
-      <h2>Dashboard Overview 📊</h2>
-
-      {summary ? (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
-            gap: "16px",
-            margin: "20px 0 30px",
-          }}
-        >
-          {summaryCards.map((card) => (
-            <div
-              key={card.title}
-              style={{
-                background: card.color,
-                color: "#222",
-                padding: "20px",
-                borderRadius: "12px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-              }}
-            >
-              <p style={{ margin: "0 0 10px" }}>{card.title}</p>
-              <h2 style={{ margin: 0 }}>{card.value}</h2>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p>Loading dashboard summary...</p>
-      )}
-
-      <h2>Customer Orders 🧾</h2>
-
-      {loading ? (
-        <p>Loading orders...</p>
-      ) : orders.length === 0 ? (
-        <div className="empty-state">
-          <h2>No orders available</h2>
-          <p>Customer orders will appear here after checkout.</p>
-        </div>
-      ) : (
-        orders.map((order) => (
-          <div className="admin-order-card" key={order.orderId}>
-            <h2>Order #{order.orderId}</h2>
-            <p><strong>Customer:</strong> {order.name}</p>
-            <p><strong>Phone:</strong> {order.phone}</p>
-            <p><strong>Address:</strong> {order.address}</p>
-            <p><strong>Total:</strong> ₹{order.total}</p>
-
-            <h3>Items</h3>
-            {order.items.map((item) => (
-              <p key={item.id}>
-                {item.emoji} {item.name} × {item.quantity} — ₹
-                {item.price * item.quantity}
-              </p>
-            ))}
-
-            <label htmlFor={`status-${order.orderId}`}>
-              Update Order Status
-            </label>
-
-            <select
-              id={`status-${order.orderId}`}
-              value={order.status}
-              disabled={updatingId === order.orderId}
-              onChange={(e) =>
-                updateStatus(order.orderId, e.target.value)
-              }
-            >
-              {statuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-
-            <p><strong>Current Status:</strong> {order.status}</p>
+    <main className="admin-page">
+      <section className="admin-heading">
+        <span className="admin-eyebrow">BUDGETBITE MANAGEMENT</span>
+        <div className="admin-heading-row">
+          <div>
+            <h1>Admin Dashboard</h1>
+            <p>Manage orders, monitor revenue and update delivery progress.</p>
           </div>
-        ))
+
+          <button
+            className="admin-refresh-button"
+            onClick={refreshDashboard}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Refresh Dashboard"}
+          </button>
+        </div>
+      </section>
+
+      {error && (
+        <div className="admin-error" role="alert">
+          {error}
+        </div>
       )}
-    </div>
+
+      <section className="admin-overview">
+        <div className="admin-section-heading">
+          <div>
+            <span className="admin-eyebrow">AT A GLANCE</span>
+            <h2>Dashboard Overview</h2>
+          </div>
+        </div>
+
+        {summary ? (
+          <div className="admin-summary-grid">
+            {summaryCards.map((card, index) => (
+              <article className="admin-summary-card" key={card.title}>
+                <span className="admin-card-number">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <p>{card.title}</p>
+                <h3>{card.value ?? 0}</h3>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="admin-muted">
+            Dashboard summary is unavailable. Try refreshing.
+          </p>
+        )}
+      </section>
+
+      <section className="admin-orders-section">
+        <div className="admin-section-heading">
+          <div>
+            <span className="admin-eyebrow">ORDER MANAGEMENT</span>
+            <h2>Customer Orders</h2>
+          </div>
+          <span className="admin-order-count">
+            {orders.length} {orders.length === 1 ? "order" : "orders"}
+          </span>
+        </div>
+
+        {loading ? (
+          <div className="admin-empty-state">
+            <p>Loading customer orders...</p>
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="admin-empty-state">
+            <h3>No orders yet</h3>
+            <p>Customer orders will appear here after checkout.</p>
+          </div>
+        ) : (
+          <div className="admin-orders-list">
+            {orders.map((order) => (
+              <article className="admin-order-card" key={order.orderId}>
+                <div className="admin-order-top">
+                  <div>
+                    <span className="admin-eyebrow">ORDER REFERENCE</span>
+                    <h3>#{order.orderId}</h3>
+                  </div>
+                  <span className="admin-status-label">{order.status}</span>
+                </div>
+
+                <div className="admin-order-details">
+                  <div>
+                    <span>Customer</span>
+                    <p>{order.name || "Not provided"}</p>
+                  </div>
+                  <div>
+                    <span>Phone</span>
+                    <p>{order.phone || "Not provided"}</p>
+                  </div>
+                  <div className="admin-address">
+                    <span>Delivery Address</span>
+                    <p>{order.address || "Not provided"}</p>
+                  </div>
+                  <div>
+                    <span>Order Total</span>
+                    <p className="admin-order-total">
+                      ₹{Number(order.total || 0).toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="admin-items-section">
+                  <h4>Items Ordered</h4>
+                  {(order.items || []).map((item, index) => (
+                    <div
+                      className="admin-item-row"
+                      key={item.id ?? `${item.name}-${index}`}
+                    >
+                      <span>{item.name} × {item.quantity}</span>
+                      <strong>
+                        ₹{(
+                          Number(item.price || 0) *
+                          Number(item.quantity || 0)
+                        ).toLocaleString("en-IN")}
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="admin-status-control">
+                  <label htmlFor={`status-${order.orderId}`}>
+                    Update Order Status
+                  </label>
+                  <select
+                    id={`status-${order.orderId}`}
+                    value={order.status}
+                    disabled={updatingId === order.orderId}
+                    onChange={(event) =>
+                      updateStatus(order.orderId, event.target.value)
+                    }
+                  >
+                    {statuses.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+
+                  {updatingId === order.orderId && (
+                    <span className="admin-updating">Saving status...</span>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
   );
 }
 

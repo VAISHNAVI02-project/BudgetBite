@@ -2,14 +2,21 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80";
+
 function Cart() {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    const savedCart = JSON.parse(
-      localStorage.getItem("budgetBiteCart") || "[]"
-    );
-    setCart(savedCart);
+    try {
+      const savedCart = JSON.parse(
+        localStorage.getItem("budgetBiteCart") || "[]"
+      );
+      setCart(Array.isArray(savedCart) ? savedCart : []);
+    } catch {
+      setCart([]);
+    }
   }, []);
 
   function updateCart(updatedCart) {
@@ -21,7 +28,7 @@ function Cart() {
     const updatedCart = cart
       .map((item) =>
         item.id === id
-          ? { ...item, quantity: item.quantity + amount }
+          ? { ...item, quantity: Number(item.quantity) + amount }
           : item
       )
       .filter((item) => item.quantity > 0);
@@ -34,60 +41,130 @@ function Cart() {
   }
 
   const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) =>
+      sum + Number(item.price) * Number(item.quantity),
+    0
+  );
+
+  const itemCount = cart.reduce(
+    (sum, item) => sum + Number(item.quantity),
     0
   );
 
   return (
-    <div className="page-container">
-      <h1>Your Cart 🛒</h1>
+    <div className="cart-page">
+      <header className="cart-heading">
+        <span className="cart-eyebrow">YOUR SELECTION</span>
+        <h1>Your shopping cart</h1>
+        <p>Review your items before moving to checkout.</p>
+      </header>
 
       {cart.length === 0 ? (
-        <div>
-          <p>Your cart is empty.</p>
-          <Link to="/menu">
-            <button>Explore Food</button>
+        <section className="cart-empty">
+          <div className="cart-empty-line" />
+          <h2>Your cart is waiting for something delicious.</h2>
+          <p>Explore the menu and add your favourite meals.</p>
+          <Link className="cart-primary-link" to="/menu">
+            Explore the menu <span>→</span>
           </Link>
-        </div>
+        </section>
       ) : (
-        <>
-          {cart.map((item) => (
-            <div className="cart-item" key={item.id}>
-              <span className="cart-emoji">{item.emoji}</span>
-
-              <div className="cart-details">
-                <h3>{item.name}</h3>
-                <p>₹{item.price} each</p>
-              </div>
-
-              <div className="quantity-controls">
-                <button onClick={() => changeQuantity(item.id, -1)}>
-                  −
-                </button>
-                <span>{item.quantity}</span>
-                <button onClick={() => changeQuantity(item.id, 1)}>
-                  +
-                </button>
-              </div>
-
-              <strong>₹{item.price * item.quantity}</strong>
-
-              <button
-                className="remove-button"
-                onClick={() => removeItem(item.id)}
-              >
-                Remove
-              </button>
+        <div className="cart-layout">
+          <section className="cart-items-section">
+            <div className="cart-items-heading">
+              <h2>Order items</h2>
+              <span>{itemCount} items</span>
             </div>
-          ))}
 
-          <div className="cart-total">
-            <h2>Total: ₹{total}</h2>
-            <Link to="/checkout">
-              <button>Proceed to Checkout</button>
+            {cart.map((item) => (
+              <article className="cart-product" key={item.id}>
+                <img
+                  className="cart-product-image"
+                  src={item.imageUrl || FALLBACK_IMAGE}
+                  alt={item.name}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = FALLBACK_IMAGE;
+                  }}
+                />
+
+                <div className="cart-product-info">
+                  <span className="cart-product-category">
+                    {item.category || "Menu item"}
+                  </span>
+                  <h3>{item.name}</h3>
+                  <p>₹{Number(item.price).toFixed(0)} per item</p>
+
+                  <button
+                    className="cart-remove"
+                    onClick={() => removeItem(item.id)}
+                  >
+                    Remove item
+                  </button>
+                </div>
+
+                <div className="cart-product-actions">
+                  <div className="cart-quantity">
+                    <button
+                      aria-label={`Decrease ${item.name} quantity`}
+                      onClick={() => changeQuantity(item.id, -1)}
+                    >
+                      −
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      aria-label={`Increase ${item.name} quantity`}
+                      onClick={() => changeQuantity(item.id, 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <strong className="cart-line-total">
+                    ₹
+                    {(Number(item.price) * Number(item.quantity)).toFixed(0)}
+                  </strong>
+                </div>
+              </article>
+            ))}
+
+            <Link className="cart-continue-link" to="/menu">
+              ← Continue shopping
             </Link>
-          </div>
-        </>
+          </section>
+
+          <aside className="cart-summary">
+            <span className="cart-eyebrow">ORDER SUMMARY</span>
+            <h2>Order total</h2>
+
+            <div className="cart-summary-row">
+              <span>Items ({itemCount})</span>
+              <span>₹{total.toFixed(0)}</span>
+            </div>
+
+            <div className="cart-summary-row">
+              <span>Delivery</span>
+              <span>Calculated at checkout</span>
+            </div>
+
+            <div className="cart-summary-total">
+              <span>Subtotal</span>
+              <strong>₹{total.toFixed(0)}</strong>
+            </div>
+
+            <p className="cart-summary-note">
+              Final charges, if any, will be shown before you place your order.
+            </p>
+
+            <Link className="cart-checkout-button" to="/checkout">
+              Proceed to checkout <span>→</span>
+            </Link>
+
+            <p className="cart-secure-note">
+              Review your order details before confirming.
+            </p>
+          </aside>
+        </div>
       )}
     </div>
   );

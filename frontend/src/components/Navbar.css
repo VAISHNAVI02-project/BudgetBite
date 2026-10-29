@@ -1,49 +1,101 @@
 
 .navbar {
+  width: 100%;
+  min-height: 76px;
+  padding: 16px 5%;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  padding: 18px 5%;
-  background: white;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  gap: 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #f1e5da;
+  box-shadow: 0 3px 15px rgba(65, 35, 15, 0.05);
+  position: relative;
+  z-index: 10;
 }
 
-.brand {
-  color: #e85d04;
+.navbar .brand {
+  color: #9a3412;
   font-size: 25px;
-  font-weight: bold;
+  font-weight: 800;
   text-decoration: none;
+  white-space: nowrap;
 }
 
-.nav-links {
+.navbar .nav-links {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: flex-end;
   flex-wrap: wrap;
+  gap: 10px;
 }
 
-.nav-link {
-  color: #333;
+.navbar .nav-link {
+  color: #514239;
   text-decoration: none;
+  font-size: 14px;
   font-weight: 600;
+  padding: 10px 13px;
+  border-radius: 9px;
+  transition: background 0.2s, color 0.2s;
 }
 
-.nav-link:hover,
-.nav-link.active {
-  color: #e85d04;
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: #c2410c;
+  background: #fff0e3;
 }
 
-@media (max-width: 700px) {
+.navbar .nav-register {
+  display: inline-block;
+  padding: 11px 18px;
+  border-radius: 10px;
+  background: #e85d04;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navbar .nav-register:hover {
+  background: #c94b00;
+}
+
+.navbar .nav-user {
+  color: #7c2d12;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px;
+}
+
+.navbar .nav-logout {
+  background: #fff0e3;
+  color: #9a3412;
+  padding: 10px 15px;
+  border-radius: 9px;
+  font-size: 14px;
+}
+
+.navbar .nav-logout:hover {
+  background: #ffe0c2;
+}
+
+@media (max-width: 750px) {
   .navbar {
+    padding: 16px 20px;
+    align-items: flex-start;
     flex-direction: column;
+    gap: 12px;
   }
 
-  .nav-links {
-    justify-content: center;
-    gap: 12px;
+  .navbar .nav-links {
+    justify-content: flex-start;
+    width: 100%;
+    gap: 5px;
+  }
+
+  .navbar .nav-link {
+    padding: 9px;
   }
 }

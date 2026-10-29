@@ -4,6 +4,8 @@ require("./db");
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -13,7 +15,152 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("BudgetBite backend is working!");
 });
+// Register a new customer
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      typeof email !== "string" ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      typeof password !== "string" ||
+      password.length < 8 ||
+      password.length > 72
+    ) {
+      return res.status(400).json({
+        error: "Enter a valid name and email. Password must be 8–72 characters."
+      });
+    }
+
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    db.query(
+      "SELECT id FROM users WHERE email = ?",
+      [cleanEmail],
+      async (err, results) => {
+        if (err) {
+          return res.status(500).json({ error: "Registration failed." });
+        }
+
+        if (results.length > 0) {
+          return res.status(409).json({
+            error: "An account with this email already exists."
+          });
+        }
+
+        try {
+          const passwordHash = await bcrypt.hash(password, 12);
+
+          db.query(
+            "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
+            [cleanName, cleanEmail, passwordHash],
+            (err, result) => {
+              if (err) {
+                if (err.code === "ER_DUP_ENTRY") {
+                  return res.status(409).json({
+                    error: "An account with this email already exists."
+                  });
+                }
+
+                return res.status(500).json({
+                  error: "Could not create your account."
+                });
+              }
+
+              res.status(201).json({
+                message: "Account created successfully!",
+                user: {
+                  id: result.insertId,
+                  name: cleanName,
+                  email: cleanEmail,
+                  role: "customer"
+                }
+              });
+            }
+          );
+        } catch {
+          res.status(500).json({ error: "Registration failed." });
+        }
+      }
+    );
+  } catch {
+    res.status(500).json({ error: "Registration failed." });
+  }
+});
+
+// Log in an existing customer
+app.post("/api/auth/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (
+    typeof email !== "string" ||
+    typeof password !== "string" ||
+    !email.trim() ||
+    !password ||
+    password.length > 72
+  ) {
+    return res.status(400).json({ error: "Enter your email and password." });
+  }
+
+  db.query(
+    "SELECT id, name, email, password_hash, role FROM users WHERE email = ?",
+    [email.trim().toLowerCase()],
+    async (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: "Login failed." });
+      }
+      console.log("Login email found:", results.length > 0);
+console.log(
+  "Password hash exists:",
+  results.length > 0 && !!results[0].password_hash
+);
+      console.log("Email found:", results.length > 0);
+
+if (results.length > 0) {
+  console.log(
+    "Password matches:",
+    await bcrypt.compare(password, results[0].password_hash)
+  );
+}
+if (
+        results.length === 0 ||
+        !(await bcrypt.compare(password, results[0].password_hash))
+      ) {
+        return res.status(401).json({
+          error: "Invalid email or password."
+        });
+      }
+
+      const user = results[0];
+
+      if (!process.env.JWT_SECRET) {
+        return res.status(500).json({
+          error: "Authentication is not configured on the server."
+        });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "2h" }
+      );
+
+      res.json({
+        message: "Login successful!",
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        }
+      });
+    }
+  );
+});
 app.get("/api/foods", (req, res) => {
   db.query("SELECT * FROM food_items", (err, results) => {
     if (err) {
