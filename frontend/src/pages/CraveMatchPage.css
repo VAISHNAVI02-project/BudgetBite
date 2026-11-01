@@ -1,0 +1,131 @@
+.crave-match-page {
+  padding-top: 2rem;
+}
+
+.crave-header {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 3rem;
+}
+
+.crave-page-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin: 0.6rem 0 0.75rem;
+}
+
+.crave-page-sub {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+}
+
+/* Crave Options Grid */
+.crave-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 3.5rem;
+}
+
+.craving-option-card {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-normal);
+  background-color: var(--bg-surface);
+}
+
+.craving-option-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-terracotta);
+  box-shadow: var(--shadow-md);
+}
+
+.craving-option-card.active {
+  border-color: var(--color-terracotta);
+  background: linear-gradient(180deg, #FFFFFF, #FFF9F5);
+  box-shadow: 0 8px 24px rgba(232, 121, 69, 0.2);
+  transform: translateY(-6px);
+}
+
+.craving-emoji {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.craving-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-plum);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.craving-short {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.selected-indicator {
+  position: absolute;
+  top: -10px;
+  background-color: var(--color-terracotta);
+  color: #FFFFFF;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.5px;
+}
+
+/* Results section */
+.results-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1.5px solid var(--border-color);
+}
+
+.results-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.banner-emoji {
+  font-size: 1.8rem;
+}
+
+.results-badge h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.results-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 1100px) {
+  .crave-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .crave-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

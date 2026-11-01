@@ -1,0 +1,230 @@
+.food-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.food-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.food-card.unavailable {
+  opacity: 0.75;
+}
+
+.food-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  overflow: hidden;
+  background-color: var(--bg-surface-alt);
+}
+
+.food-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.food-card:hover .food-image {
+  transform: scale(1.05);
+}
+
+.food-diet-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: #FFFFFF;
+  padding: 4px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  display: flex;
+}
+
+.food-category-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: rgba(51, 41, 64, 0.85);
+  backdrop-filter: blur(4px);
+  color: #FFFFFF;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  text-transform: capitalize;
+}
+
+.out-of-stock-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(51, 41, 64, 0.7);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+
+.food-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.food-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.food-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-plum);
+  line-height: 1.3;
+}
+
+.food-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  background-color: var(--color-gold-light);
+  color: #936B1A;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.star-icon {
+  color: var(--color-gold);
+}
+
+.rating-count {
+  font-size: 0.7rem;
+  color: #A37F38;
+}
+
+.food-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-bottom: 0.75rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.food-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.food-tag {
+  font-size: 0.7rem;
+  color: var(--color-forest);
+  background-color: var(--color-sage-light);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.food-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.price-box {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.currency-symbol {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-plum);
+}
+
+.price-amount {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-plum);
+}
+
+.add-cart-btn {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--color-terracotta);
+  color: var(--color-terracotta);
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.add-cart-btn:hover {
+  background-color: var(--color-terracotta);
+  color: #FFFFFF;
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--color-terracotta-light);
+  border: 1px solid rgba(232, 121, 69, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.qty-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  color: var(--color-terracotta);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.qty-btn:hover {
+  background-color: var(--color-terracotta);
+  color: #FFFFFF;
+}
+
+.qty-count {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--color-terracotta);
+  min-width: 18px;
+  text-align: center;
+}
+
+.sold-out-btn {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  font-weight: 600;
+  padding: 0.4rem 0.6rem;
+}

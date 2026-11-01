@@ -1,0 +1,153 @@
+.combo-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  border: 1.5px solid var(--border-light);
+}
+
+.combo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px rgba(51, 41, 64, 0.12);
+  border-color: rgba(232, 121, 69, 0.3);
+}
+
+.combo-image-box {
+  position: relative;
+  height: 200px;
+  background-color: var(--bg-surface-alt);
+  overflow: hidden;
+}
+
+.combo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.combo-card:hover .combo-img {
+  transform: scale(1.05);
+}
+
+.savings-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, var(--color-terracotta), #D56734);
+  color: #FFFFFF;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 4px 12px rgba(232, 121, 69, 0.35);
+  letter-spacing: 0.5px;
+}
+
+.combo-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.combo-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-plum);
+  margin-bottom: 0.4rem;
+}
+
+.combo-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-bottom: 1.1rem;
+}
+
+.combo-items-list {
+  background-color: var(--bg-primary);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+}
+
+.items-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-forest);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.combo-items-list ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.combo-items-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-plum);
+  font-weight: 500;
+}
+
+.check-icon {
+  color: var(--color-sage);
+  flex-shrink: 0;
+}
+
+.combo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.combo-pricing {
+  display: flex;
+  flex-direction: column;
+}
+
+.original-price {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  text-decoration: line-through;
+  font-weight: 600;
+}
+
+.current-price {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.current-price .currency {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-plum);
+}
+
+.current-price .amount {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-plum);
+}
+
+.add-combo-btn {
+  padding: 0.5rem 1.1rem;
+  font-size: 0.9rem;
+}
