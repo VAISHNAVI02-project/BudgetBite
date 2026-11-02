@@ -140,30 +140,64 @@ const createOrder = async (req, res, next) => {
     const userId = req.user.id;
 
     // Insert Order record
-    const [orderResult] = await connection.query(
-      `INSERT INTO orders (
-        order_number, user_id, customer_name, customer_email, customer_phone,
-        delivery_address, delivery_instructions, payment_method, payment_status,
-        subtotal, delivery_fee, total_amount, order_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        orderNumber,
-        userId,
-        customer_name.trim(),
-        customer_email.trim().toLowerCase(),
-        customer_phone.trim(),
-        delivery_address.trim(),
-        delivery_instructions ? delivery_instructions.trim() : null,
-        payment_method === 'Online Payment' ? 'Online Payment' : 'Cash on Delivery',
-        payment_method === 'Online Payment' ? 'Completed' : 'Pending',
-        calculatedSubtotal,
-        deliveryFee,
-        grandTotal,
-        'Order Placed'
-      ]
-    );
+    // Generate Order ID
+const [lastOrder] = await connection.query(
+  'SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM orders'
+);
+const orderId = lastOrder[0].nextId;
 
-    const orderId = orderResult.insertId;
+// Insert Order record
+await connection.query(
+  `INSERT INTO orders (
+    id, order_number, user_id, customer_name, customer_email, customer_phone,
+    delivery_address, delivery_instructions, payment_method, payment_status,
+    subtotal, delivery_fee, total_amount, order_status
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  [
+    orderId,
+    orderNumber,
+    userId,
+    customer_name.trim(),
+    customer_email.trim().toLowerCase(),
+    customer_phone.trim(),
+    delivery_address.trim(),
+    delivery_instructions ? delivery_instructions.trim() : null,
+    payment_method === 'Online Payment' ? 'Online Payment' : 'Cash on Delivery',
+    payment_method === 'Online Payment' ? 'Completed' : 'Pending',
+    calculatedSubtotal,
+    deliveryFee,
+    grandTotal,
+    'Order Placed'
+  ]
+);
+
+// Generate and insert Order Items
+const [lastItem] = await connection.query(
+  'SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM order_items'
+);
+
+let nextItemId = lastItem[0].nextId;
+
+for (const orderItem of validatedOrderItems) {
+  await connection.query(
+    `INSERT INTO order_items (
+      id, order_id, food_id, combo_id, item_type, item_name,
+      unit_price, quantity, subtotal
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      nextItemId++,
+      orderId,
+      orderItem.food_id,
+      orderItem.combo_id,
+      orderItem.item_type,
+      orderItem.item_name,
+      orderItem.unit_price,
+      orderItem.quantity,
+      orderItem.subtotal
+    ]
+  );
+}
+
 
     // Insert order items
     for (const orderItem of validatedOrderItems) {
