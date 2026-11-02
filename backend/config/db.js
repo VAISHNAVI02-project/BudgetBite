@@ -8,6 +8,12 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'budgetbite',
   port: parseInt(process.env.DB_PORT || '3306', 10),
+  ssl: process.env.DB_SSL_CA
+  ? {
+      ca: process.env.DB_SSL_CA,
+      minVersion: 'TLSv1.2'
+    }
+  : undefined,
 
   // Enable secure connection for remote TiDB Cloud
   ssl: process.env.DB_HOST && process.env.DB_HOST !== 'localhost'
