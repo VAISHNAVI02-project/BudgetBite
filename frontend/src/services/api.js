@@ -1,18 +1,9 @@
 import axios from 'axios';
 
-// Dynamically compute API base URL to support testing on mobile devices over local Wi-Fi
-const getApiBaseUrl = () => {
-  if (typeof window !== 'undefined' && window.location && window.location.hostname) {
-    const host = window.location.hostname;
-    // When accessed from mobile phone on the local Wi-Fi network, connect to phone's host IP at port 5000
-    if (host !== 'localhost' && host !== '127.0.0.1') {
-      return `http://${host}:5000/api`;
-    }
-  }
-  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-};
 
-const API_BASE_URL = getApiBaseUrl();
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || 'https://budgetbite-8wsl.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
