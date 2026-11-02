@@ -47,10 +47,16 @@ const register = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const [result] = await pool.query(
-      'INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, ?)',
-      [name.trim(), normalizedEmail, hashedPassword, phone.trim(), 'customer']
-    );
+    const [lastUser] = await pool.query(
+  'SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM users'
+);
+
+const nextId = lastUser[0].nextId;
+
+const [result] = await pool.query(
+  'INSERT INTO users (id, name, email, password, phone, role) VALUES (?, ?, ?, ?, ?, ?)',
+  [nextId, name.trim(), normalizedEmail, hashedPassword, phone.trim(), 'customer']
+);
 
     const newUser = {
       id: result.insertId,
