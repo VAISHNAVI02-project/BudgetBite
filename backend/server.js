@@ -25,7 +25,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS Configuration supporting localhost and Local Area / Wi-Fi network IPs (for mobile testing)
-const allowedOriginRegex = /^(http:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?)$/;
+const allowedOriginRegex = /^(https:\/\/[a-z0-9-]+\.vercel\.app|http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?)$/;
 
 app.use(cors({
   origin: (origin, callback) => {
