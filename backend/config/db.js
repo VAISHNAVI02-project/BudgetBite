@@ -1,3 +1,4 @@
+
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
@@ -7,6 +8,12 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'budgetbite',
   port: parseInt(process.env.DB_PORT || '3306', 10),
+
+  // Enable secure connection for remote TiDB Cloud
+  ssl: process.env.DB_HOST && process.env.DB_HOST !== 'localhost'
+    ? { minVersion: 'TLSv1.2' }
+    : undefined,
+
   waitForConnections: true,
   connectionLimit: 15,
   queueLimit: 0,
