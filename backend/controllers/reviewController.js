@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const getNextId = require('../config/nextId');
 
 // Submit a new review for a delivered order
 const createReview = async (req, res, next) => {
@@ -62,9 +63,10 @@ const createReview = async (req, res, next) => {
       });
     }
 
-    const [result] = await pool.query(
-      'INSERT INTO reviews (user_id, order_id, food_id, rating, comment) VALUES (?, ?, ?, ?, ?)',
-      [userId, order_id, food_id || null, ratingNum, comment.trim()]
+    const reviewId = await getNextId(pool, 'reviews');
+    await pool.query(
+      'INSERT INTO reviews (id, user_id, order_id, food_id, rating, comment) VALUES (?, ?, ?, ?, ?, ?)',
+      [reviewId, userId, order_id, food_id || null, ratingNum, comment.trim()]
     );
 
     // If review targeted specific food, update its rating
@@ -84,7 +86,7 @@ const createReview = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: 'Thank you! Your review has been submitted.',
-      review_id: result.insertId
+      review_id: reviewId
     });
   } catch (error) {
     next(error);

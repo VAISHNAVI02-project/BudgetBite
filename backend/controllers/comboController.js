@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const getNextId = require('../config/nextId');
 
 // Get all combos with included food items
 const getCombos = async (req, res, next) => {
@@ -97,10 +98,12 @@ const createCombo = async (req, res, next) => {
 
     const savings = parseFloat(original_price) - parseFloat(price);
 
-    const [result] = await connection.query(
-      `INSERT INTO combos (name, description, price, original_price, savings, image_url, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    const comboId = await getNextId(connection, 'combos');
+    await connection.query(
+      `INSERT INTO combos (id, name, description, price, original_price, savings, image_url, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        comboId,
         name.trim(),
         description || '',
         parseFloat(price),
@@ -111,7 +114,6 @@ const createCombo = async (req, res, next) => {
       ]
     );
 
-    const comboId = result.insertId;
 
     // Insert combo items if provided
     let parsedItems = items;
@@ -126,9 +128,10 @@ const createCombo = async (req, res, next) => {
     if (Array.isArray(parsedItems) && parsedItems.length > 0) {
       for (const item of parsedItems) {
         if (item.food_id) {
+          const comboItemId = await getNextId(connection, 'combo_items');
           await connection.query(
-            'INSERT INTO combo_items (combo_id, food_id, quantity) VALUES (?, ?, ?)',
-            [comboId, item.food_id, item.quantity || 1]
+            'INSERT INTO combo_items (id, combo_id, food_id, quantity) VALUES (?, ?, ?, ?)',
+            [comboItemId, comboId, item.food_id, item.quantity || 1]
           );
         }
       }
@@ -223,9 +226,10 @@ const updateCombo = async (req, res, next) => {
       if (Array.isArray(parsedItems)) {
         for (const item of parsedItems) {
           if (item.food_id) {
+            const comboItemId = await getNextId(connection, 'combo_items');
             await connection.query(
-              'INSERT INTO combo_items (combo_id, food_id, quantity) VALUES (?, ?, ?)',
-              [id, item.food_id, item.quantity || 1]
+              'INSERT INTO combo_items (id, combo_id, food_id, quantity) VALUES (?, ?, ?, ?)',
+              [comboItemId, id, item.food_id, item.quantity || 1]
             );
           }
         }

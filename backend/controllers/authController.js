@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const getNextId = require('../config/nextId');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -47,11 +48,7 @@ const register = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const [lastUser] = await pool.query(
-  'SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM users'
-);
-
-const nextId = lastUser[0].nextId;
+    const nextId = await getNextId(pool, 'users');
 
 const [result] = await pool.query(
   'INSERT INTO users (id, name, email, password, phone, role) VALUES (?, ?, ?, ?, ?, ?)',
@@ -59,7 +56,7 @@ const [result] = await pool.query(
 );
 
     const newUser = {
-      id: result.insertId,
+      id: nextId,
       name: name.trim(),
       email: normalizedEmail,
       phone: phone.trim(),

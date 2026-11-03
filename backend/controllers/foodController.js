@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const getNextId = require('../config/nextId');
 
 // Get all foods with flexible filters & search
 const getFoods = async (req, res, next) => {
@@ -151,10 +152,12 @@ const createFood = async (req, res, next) => {
       finalImageUrl = `/uploads/${req.file.filename}`;
     }
 
-    const [result] = await pool.query(
-      `INSERT INTO foods (category_id, name, description, price, is_veg, is_available, image_url, tags)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    const foodId = await getNextId(pool, 'foods');
+    await pool.query(
+      `INSERT INTO foods (id, category_id, name, description, price, is_veg, is_available, image_url, tags)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        foodId,
         parseInt(category_id, 10),
         name.trim(),
         description || '',
@@ -171,7 +174,7 @@ const createFood = async (req, res, next) => {
       FROM foods f
       JOIN categories c ON f.category_id = c.id
       WHERE f.id = ?
-    `, [result.insertId]);
+    `, [foodId]);
 
     res.status(201).json({
       success: true,

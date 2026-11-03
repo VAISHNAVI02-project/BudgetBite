@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const getNextId = require('../config/nextId');
 
 // Get all categories with food count
 const getCategories = async (req, res, next) => {
@@ -34,16 +35,17 @@ const createCategory = async (req, res, next) => {
 
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-    const [result] = await pool.query(
-      'INSERT INTO categories (name, slug, description, image_url, display_order) VALUES (?, ?, ?, ?, ?)',
-      [name.trim(), slug, description || '', image_url || null, display_order || 0]
+    const categoryId = await getNextId(pool, 'categories');
+    await pool.query(
+      'INSERT INTO categories (id, name, slug, description, image_url, display_order) VALUES (?, ?, ?, ?, ?, ?)',
+      [categoryId, name.trim(), slug, description || '', image_url || null, display_order || 0]
     );
 
     res.status(201).json({
       success: true,
       message: 'Category created successfully.',
       category: {
-        id: result.insertId,
+        id: categoryId,
         name,
         slug,
         description,

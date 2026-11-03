@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const getNextId = require('../config/nextId');
 const bcrypt = require('bcryptjs');
 
 // Get profile details with saved addresses
@@ -124,10 +125,12 @@ const addAddress = async (req, res, next) => {
       await pool.query('UPDATE addresses SET is_default = 0 WHERE user_id = ?', [userId]);
     }
 
-    const [result] = await pool.query(
-      `INSERT INTO addresses (user_id, address_line, landmark, city, state, postal_code, is_default)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    const addressId = await getNextId(pool, 'addresses');
+    await pool.query(
+      `INSERT INTO addresses (id, user_id, address_line, landmark, city, state, postal_code, is_default)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        addressId,
         userId,
         address_line.trim(),
         landmark || null,
@@ -138,7 +141,7 @@ const addAddress = async (req, res, next) => {
       ]
     );
 
-    const [newAddress] = await pool.query('SELECT * FROM addresses WHERE id = ?', [result.insertId]);
+    const [newAddress] = await pool.query('SELECT * FROM addresses WHERE id = ?', [addressId]);
 
     res.status(201).json({
       success: true,

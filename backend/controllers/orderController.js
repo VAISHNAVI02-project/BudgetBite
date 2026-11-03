@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const getNextId = require('../config/nextId');
 const { generateOrderNumber } = require('../utils/orderUtils');
 
 // Create a new order with complete backend price validation and transaction
@@ -141,10 +142,7 @@ const createOrder = async (req, res, next) => {
 
     // Insert Order record
     // Generate Order ID
-const [lastOrder] = await connection.query(
-  'SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM orders'
-);
-const orderId = lastOrder[0].nextId;
+const orderId = await getNextId(connection, 'orders');
 
 // Insert Order record
 await connection.query(
@@ -172,11 +170,7 @@ await connection.query(
 );
 
 // Generate Order Item IDs
-const [lastItem] = await connection.query(
-  'SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM order_items'
-);
-
-let nextItemId = lastItem[0].nextId;
+let nextItemId = await getNextId(connection, 'order_items');
 
 for (const orderItem of validatedOrderItems) {
   await connection.query(
