@@ -171,7 +171,7 @@ await connection.query(
   ]
 );
 
-// Generate and insert Order Items
+// Generate Order Item IDs
 const [lastItem] = await connection.query(
   'SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM order_items'
 );
@@ -200,23 +200,7 @@ for (const orderItem of validatedOrderItems) {
 
 
     // Insert order items
-    for (const orderItem of validatedOrderItems) {
-      await connection.query(
-        `INSERT INTO order_items (
-          order_id, food_id, combo_id, item_type, item_name, unit_price, quantity, subtotal
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          orderId,
-          orderItem.food_id,
-          orderItem.combo_id,
-          orderItem.item_type,
-          orderItem.item_name,
-          orderItem.unit_price,
-          orderItem.quantity,
-          orderItem.subtotal
-        ]
-      );
-    }
+    
 
     await connection.commit();
 
